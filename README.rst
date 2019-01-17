@@ -2,10 +2,10 @@ This repository contains various tools which are helpful when
 communicating with OS2MO.
 
 
-Licens og Copyright
--------------------
+License and Copyright
+---------------------
 
-Copyright (c) 2018, Magenta ApS.
+Copyright (c) 2019, Magenta ApS.
 
 OS2MO Tools is free software and may be used, studied, modified and shared
 under the terms of `Mozilla Public License, version 2.0
