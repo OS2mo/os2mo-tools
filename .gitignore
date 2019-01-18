@@ -1,1 +1,4 @@
 os2mo_tools/__pycache__/
+build/
+dist/
+os2mo_tools.egg-info/

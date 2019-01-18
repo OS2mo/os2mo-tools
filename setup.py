@@ -16,7 +16,7 @@ setuptools.setup(
     author_email='info@magenta.dk',
     packages=setuptools.find_packages(),
     install_requires=[
-        'requests==2.20.0',
+        'requests>=2.21.0',
         'cached_property==1.5.1'
     ],
     classifiers=[
