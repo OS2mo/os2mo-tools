@@ -87,7 +87,7 @@ class MOData:
         return str(self.json)
 
 
-class MOOrgUnit(MOData):
+class OrgUnit(MOData):
     """A MO organisation unit, e.g. a department in a municipality."""
 
     def __init__(self, uuid, mo_url=DEFAULT_MO_URL):
@@ -96,7 +96,7 @@ class MOOrgUnit(MOData):
         self.url = mo_url + '/ou/' + self.uuid
 
 
-class MOEmployee(MOData):
+class Employee(MOData):
     """A MO employee."""
 
     def __init__(self, uuid, mo_url=DEFAULT_MO_URL):
@@ -120,7 +120,7 @@ if __name__ == '__main__':  # pragma: no cover
     # DEFAULT_MO_URL and ORG_ROOT are properly configured.
     ou_uuid = get_ous(ORG_ROOT)[0]['uuid']
     e_uuid = get_employees(ORG_ROOT)[0]['uuid']
-    ou = MOOrgUnit(ou_uuid)
-    e = MOEmployee(e_uuid)
+    ou = OrgUnit(ou_uuid)
+    e = Employee(e_uuid)
     print(ou.json['name'])
     print(e.json['name'])
