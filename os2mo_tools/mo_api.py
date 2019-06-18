@@ -107,36 +107,30 @@ class Employee(MOData):
 
 def get_ous(org_id=ORG_ROOT, mo_url=DEFAULT_MO_URL):
     """Get all organization units belonging to org_id."""
-    result = []
     ou_url = mo_url + "/o/" + org_id + "/ou/"
     total_ous = mo_get("{}?limit=1".format(ou_url))["total"]
     offset = 1000
     start = 0
 
-    while len(result) < total_ous and start < total_ous:
-        result += mo_get(
+    while start < total_ous:
+        yield from mo_get(
             "{}?limit={}&start={}".format(ou_url, offset, start)
         )["items"]
         start += offset
 
-    return result
-
 
 def get_employees(org_id=ORG_ROOT, mo_url=DEFAULT_MO_URL):
     """Get all employees belonging to the given organization."""
-    result = []
     employee_url = mo_url + "/o/" + org_id + "/e/"
     total_employees = mo_get("{}?limit=1".format(employee_url))["total"]
     offset = 1000
     start = 0
 
-    while len(result) < total_employees and start < total_employees:
-        result += mo_get(
+    while start < total_employees:
+        yield from mo_get(
             "{}?limit={}&start={}".format(employee_url, offset, start)
         )["items"]
         start += offset
-
-    return result
 
 
 if __name__ == "__main__":  # pragma: no cover
