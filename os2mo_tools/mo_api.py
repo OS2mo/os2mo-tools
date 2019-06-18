@@ -20,10 +20,10 @@ global_session = requests.Session()
 
 
 DEFAULT_MO_URL = os.environ.get(
-        'MO_URL', 'http://morademo.atlas.magenta.dk/service'
+    "MO_URL", "http://morademo.atlas.magenta.dk/service"
 )
 ORG_ROOT = os.environ.get(
-    'MO_ORG_ROOT', '293089ba-a1d7-4fff-a9d0-79bd8bab4e5b'
+    "MO_ORG_ROOT", "293089ba-a1d7-4fff-a9d0-79bd8bab4e5b"
 )
 
 
@@ -60,14 +60,14 @@ class MOData:
 
         Will currently only work with Org Units.
         """
-        return self.get(self.url + '/children')
+        return self.get(self.url + "/children")
 
     @cached_property
     def _details(self):
-        return self.get(self.url + '/details/')
+        return self.get(self.url + "/details/")
 
     def _get_detail(self, detail):
-        return self.get(self.url + '/details/' + detail)
+        return self.get(self.url + "/details/" + detail)
 
     def __getattr__(self, name):
         """Get details if field in details for object.
@@ -93,7 +93,7 @@ class OrgUnit(MOData):
     def __init__(self, uuid, mo_url=DEFAULT_MO_URL):
         """Initialize the org unit by specifying the URL prefix."""
         super().__init__(uuid)
-        self.url = mo_url + '/ou/' + self.uuid
+        self.url = mo_url + "/ou/" + self.uuid
 
 
 class Employee(MOData):
@@ -102,25 +102,49 @@ class Employee(MOData):
     def __init__(self, uuid, mo_url=DEFAULT_MO_URL):
         """Initialize the employee by specifying the URL prefix."""
         super().__init__(uuid)
-        self.url = mo_url + '/e/' + self.uuid
+        self.url = mo_url + "/e/" + self.uuid
 
 
 def get_ous(org_id=ORG_ROOT, mo_url=DEFAULT_MO_URL):
     """Get all organization units belonging to org_id."""
-    return mo_get(mo_url + '/o/' + org_id + '/ou/')['items']
+    result = []
+    ou_url = mo_url + "/o/" + org_id + "/ou/"
+    total_ous = mo_get("{}?limit=1".format(ou_url))["total"]
+    offset = 1000
+    start = 0
+
+    while len(result) < total_ous and start < total_ous:
+        result += mo_get(
+            "{}?limit={}&start={}".format(ou_url, offset, start)
+        )["items"]
+        start += offset
+
+    return result
 
 
 def get_employees(org_id=ORG_ROOT, mo_url=DEFAULT_MO_URL):
     """Get all employees belonging to the given organization."""
-    return mo_get(mo_url + '/o/' + org_id + '/e/')['items']
+    result = []
+    employee_url = mo_url + "/o/" + org_id + "/e/"
+    total_employees = mo_get("{}?limit=1".format(employee_url))["total"]
+    offset = 1000
+    start = 0
+
+    while len(result) < total_employees and start < total_employees:
+        result += mo_get(
+            "{}?limit={}&start={}".format(employee_url, offset, start)
+        )["items"]
+        start += offset
+
+    return result
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     # Note: This is just a quick smoke test. Will only work if
     # DEFAULT_MO_URL and ORG_ROOT are properly configured.
-    ou_uuid = get_ous(ORG_ROOT)[0]['uuid']
-    e_uuid = get_employees(ORG_ROOT)[0]['uuid']
+    ou_uuid = get_ous(ORG_ROOT)[0]["uuid"]
+    e_uuid = get_employees(ORG_ROOT)[0]["uuid"]
     ou = OrgUnit(ou_uuid)
     e = Employee(e_uuid)
-    print(ou.json['name'])
-    print(e.json['name'])
+    print(ou.json["name"])
+    print(e.json["name"])
