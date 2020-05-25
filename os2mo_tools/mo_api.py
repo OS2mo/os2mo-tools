@@ -18,10 +18,11 @@ logger = logging.getLogger(__name__)
 class MOData:
     """Abstract base class to interface with MO objects."""
 
-    def __init__(self, uuid, connector):
+    def __init__(self, uuid, connector, validity):
         """Initialize object from ``uuid``."""
         self.uuid = uuid
         self.connector = connector
+        self.validity = validity
         self._stored_details = defaultdict(list)
 
     @cached_property
@@ -42,7 +43,7 @@ class MOData:
         return self.connector.mo_get(self.url + "/details/")
 
     def _get_detail(self, detail):
-        return self.connector.mo_get(self.url + "/details/" + detail)
+        return self.connector.mo_get(self.url + "/details/" + detail, validity=self.validity)
 
     def __getattr__(self, name):
         """Get details if field in details for object.
@@ -65,18 +66,18 @@ class MOData:
 class OrgUnit(MOData):
     """A MO organisation unit, e.g. a department in a municipality."""
 
-    def __init__(self, uuid, connector):
+    def __init__(self, uuid, connector, validity):
         """Initialize the org unit by specifying the URL prefix."""
-        super().__init__(uuid, connector)
+        super().__init__(uuid, connector, validity)
         self.url = connector.mo_url + "/ou/" + self.uuid
 
 
 class Employee(MOData):
     """A MO employee."""
 
-    def __init__(self, uuid, connector):
+    def __init__(self, uuid, connector, validity):
         """Initialize the employee by specifying the URL prefix."""
-        super().__init__(uuid, connector)
+        super().__init__(uuid, connector, validity)
         self.url = connector.mo_url + "/e/" + self.uuid
 
 
@@ -93,12 +94,12 @@ class Connector:
         else:
             self.org_id = self._get_org()
 
-    def mo_get(self, url):
+    def mo_get(self, url, **params):
         """Helper function for getting data from MO.
 
         Return JSON content if successful, throw exception if not.
         """
-        result = self.session.get(url, verify=False)
+        result = self.session.get(url, verify=False, params=params)
         if not result:
             result.raise_for_status()
         else:
@@ -128,8 +129,8 @@ class Connector:
             )["items"]
             start += offset
 
-    def get_ou_connector(self, org_unit_uuid):
-        return OrgUnit(org_unit_uuid, self)
+    def get_ou_connector(self, org_unit_uuid, validity='present'):
+        return OrgUnit(org_unit_uuid, self, validity)
 
     def get_employees(self):
         """Get all employees belonging to the given organization."""
@@ -144,5 +145,5 @@ class Connector:
             )["items"]
             start += offset
 
-    def get_employee_connector(self, employee_uuid):
-        return Employee(employee_uuid, self)
+    def get_employee_connector(self, employee_uuid, validity='present'):
+        return Employee(employee_uuid, self, validity)
