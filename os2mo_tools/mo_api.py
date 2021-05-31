@@ -36,14 +36,14 @@ class MOData:
 
         Will currently only work with Org Units.
         """
-        return self.connector.mo_get(self.url + "/children")
+        return self.connector.mo_get(self.url + "children/")
 
     @cached_property
     def _details(self):
-        return self.connector.mo_get(self.url + "/details/")
+        return self.connector.mo_get(self.url + "details/")
 
     def _get_detail(self, detail):
-        return self.connector.mo_get(self.url + "/details/" + detail, validity=self.validity)
+        return self.connector.mo_get(self.url + "details/" + detail, validity=self.validity)
 
     def __getattr__(self, name):
         """Get details if field in details for object.
@@ -69,7 +69,7 @@ class OrgUnit(MOData):
     def __init__(self, uuid, connector, validity):
         """Initialize the org unit by specifying the URL prefix."""
         super().__init__(uuid, connector, validity)
-        self.url = connector.mo_url + "/ou/" + self.uuid
+        self.url = connector.mo_url + "/ou/" + self.uuid + "/"
 
 
 class Employee(MOData):
@@ -78,7 +78,7 @@ class Employee(MOData):
     def __init__(self, uuid, connector, validity):
         """Initialize the employee by specifying the URL prefix."""
         super().__init__(uuid, connector, validity)
-        self.url = connector.mo_url + "/e/" + self.uuid
+        self.url = connector.mo_url + "/e/" + self.uuid + "/"
 
 
 class Connector:
