@@ -10,7 +10,7 @@ import setuptools
 
 setuptools.setup(
     name='os2mo_tools',
-    version='0.2.2',
+    version='0.2.3',
     description='Tools for communicating with OS2MO',
     author='Magenta ApS',
     author_email='info@magenta.dk',

@@ -116,16 +116,22 @@ class Connector:
 
         raise Exception('No organisation found in LoRa')
 
-    def get_ous(self):
+    def get_ous(self, root=None):
         """Get all organization units belonging to org_id."""
         ou_url = self.mo_url + "/o/" + self.org_id + "/ou/"
-        total_ous = self.mo_get("{}?limit=1".format(ou_url))["total"]
+        limit_1_url = ou_url+ "?limit=1"
+        if root:
+            limit_1_url += f"&root={str(root)}"
+        total_ous = self.mo_get("{}".format(limit_1_url))["total"]
         offset = 1000
         start = 0
 
         while start < total_ous:
+            ou_url = "{}?limit={}&start={}".format(ou_url, offset, start)
+            if root:
+                ou_url += f"&root={str(root)}"
             yield from self.mo_get(
-                "{}?limit={}&start={}".format(ou_url, offset, start)
+                ou_url
             )["items"]
             start += offset
 
